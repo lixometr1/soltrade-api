@@ -1,0 +1,20 @@
+animationURL: ""
+attributes: [{trait_type: "category", value: "CyberConnect 2022 SOL Cool NFT"},…]
+collectionName: "galaxy_solcool"
+collectionTitle: "2022 is Gonna Be SOL Cool"
+content: "**Task - Let’s CyberConnect with Sol Family**\n\nFollow at least 9 participants for the “This year is gonna be Sol good” campaign featured on the front page of CyberConnect’s [Solana Social graph plaza page ](https://sol.cyberconnect.me/plaza)\n \n**Additional Rewards:**\n\nRandomly select 50 lucky participants to share the $5,000 USDC prize pool\n\nAdditional rewards will be distributed on March 1st, 2022"
+creators: [{address: "D6hfhoA56PyAtTpWUeLDnKnjVEACzFuCm5S6rEnxbjv1", verified: 1, share: 100}]
+escrowPubkey: "4W4a4W4oUULzEvWr5a7yfakA6k1STVZVexG5SvuNXih7"
+id: "2iPW9j4u7qdnFoYzkbs8Cjq8neake3cpYpD6t49nbFos"
+img: "https://d257b89266utxb.cloudfront.net/galaxy/images/cyberconnect/1644318571174008079.png"
+mintAddress: "2b6peEdXQhDGpwo6qLtfH6EGBcZBj3WNiY4DAjBYHEhA"
+onChainCollection: {}
+owner: "AELLKKa3Cv67izxVS9DiuAjnoEYu4KadZsLUTY4qXj5c"
+price: 0.0167
+primarySaleHappened: 0
+sellerFeeBasisPoints: 10
+supply: 1
+title: "CyberConnect 2022 SOL Cool NFT"
+tokenDelegateValid: false
+updateAuthority: "D6hfhoA56PyAtTpWUeLDnKnjVEACzFuCm5S6rEnxbjv1"
+v2: {auctionHouseKey: "E8cU1WiRWjanGxmn96ewBgk9vPTcL6AEZ1t6F6fkgUWe",…}

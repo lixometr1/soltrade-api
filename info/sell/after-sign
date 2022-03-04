@@ -1,0 +1,15 @@
+POST https://magiceden.rpcpool.com/
+id: "3b2b913a-c61d-4116-9d2e-f859fa4c3330"
+jsonrpc: "2.0"
+method: "sendTransaction"
+params: [,…]
+0: "AZMqNX+0y7PNyGwNXN00sL+Ee9Vpb3N42CH0SBU9FUKj+/CX4wRV7GVtOx0xEcPmiGSuooPgZwj0S0O+53YEuwoBAAoNil4kGifMjyp/ZU/XBHF7+WBvjpy1wKIitd/6FBvgGmWV/V73muVGnC3BU9Ecg0AMgYMUDbludkPRXi+WCut6tjoHZaFcu6391/V0iLZ+W4LsQFjxzHP93CL+x0plAmsKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXmARIS2TUX8TNpaXazJfNEezPIUisTkCzB5WKxF/WnRyJeCA+oZ7GxMJU6aBdh0DxZ6bitANshIQvQkAWRWMXCK/25BBZJGavm0hr5XZ58vaLQc3cMeAgkndKj2Ni7RPDGxjMPhSKClKTgYkg7frtqzkeSTNsC3TbZp0QRwNCSwbd9uHXZaGT2cvhRs7reawctIXtX1s3kTqM9YV+/wCpjJclj04kifG7PRApFI4NgwtaE5na/xCEBI572Nvp+FkAC+Ph66F6Rz+JsPfo4klA8grrjrynGoj96V1Lg7caCQan1RcZLFxRIYzJTD1K8X9Y2u4Im6H9ROPb2YoAAAAABSGfiZqB1P+E+1k9Lt+KkKwbOrNCWPffIz6lAwKxvS72m61q25qPPIYhDwLfJlZcfoP3CXFMRdb0OwbOVRW5sgEMDwADAQEEBQYHAgYIAwkKCyIz5oWkAX+Drf/6AMLrCwAAAAABAAAAAAAAAP//////////"
+1: {encoding: "base64", preflightCommitment: "recent"}
+encoding: "base64"
+preflightCommitment: "recent"
+
+
+return 
+id: "3b2b913a-c61d-4116-9d2e-f859fa4c3330"
+jsonrpc: "2.0"
+result: "3wetWX9TeoU8KCjEZubPcWv2Sv9MtUwkpM3bmUu87vdqtPMDQv5ERfZ3VDvCQvYWvi7QA1GWKXnYXCVRsnmxhqSq"

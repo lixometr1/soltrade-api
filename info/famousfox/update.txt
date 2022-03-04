@@ -1,0 +1,54 @@
+{
+    "signatures": [],
+    "instructions": [
+        {
+            "keys": [
+                {
+                    "pubkey": {
+                        "_bn": "4b3dc36e6a1d8dfe8acbf9a5dff9a37740c1f29dfc9ff03e9cc08b72c94b24b6"
+                    },
+                    "isWritable": true,
+                    "isSigner": false
+                },
+                {
+                    "pubkey": {
+                        "_bn": "8a5e241a27cc8f2a7f654fd704717bf9606f8e9cb5c0a222b5dffa141be01a65"
+                    },
+                    "isWritable": true,
+                    "isSigner": true
+                },
+                {
+                    "pubkey": {
+                        "_bn": "d9fc68a49ce0352545b4f12747891c39171f4265faa72b5c92b2bf7821e50a1c"
+                    },
+                    "isWritable": false,
+                    "isSigner": false
+                }
+            ],
+            "programId": {
+                "_bn": "6ab589706f06868ac9b7b73b907a64cbec0025e74f63d38299185cf231160d63"
+            },
+            "data": {
+                "type": "Buffer",
+                "data": [
+                    28,
+                    222,
+                    44,
+                    175,
+                    216,
+                    228,
+                    171,
+                    184,
+                    0,
+                    90,
+                    98,
+                    2,
+                    0,
+                    0,
+                    0,
+                    0
+                ]
+            }
+        }
+    ]
+}
