@@ -1,4 +1,4 @@
-import { TrackClientModule } from './modules/track-client/track-client.module';
+import { TrackPublicModule } from './modules/track-public/track-public.module';
 import { TrackCollectionModule } from './modules/track-collection/track-collection.module';
 import { OrderModule } from './modules/order/order.module';
 import { MagicEdenModule } from './modules/magic-eden/magic-eden.module';
@@ -12,6 +12,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { BullModule } from '@nestjs/bull';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { TrackClientModule } from './modules/track-client/track-client.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -39,6 +40,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     EventEmitterModule.forRoot(),
     MagicEdenModule,
     OrderModule,
+    TrackPublicModule,
     TrackCollectionModule,
     TrackClientModule,
   ],

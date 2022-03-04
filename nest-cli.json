@@ -2,18 +2,9 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "projects": {
-    "magic-eden-api": {
-      "type": "library",
-      "root": "libs/magic-eden-api",
-      "entryFile": "index",
-      "sourceRoot": "libs/magic-eden-api/src",
-      "compilerOptions": {
-        "tsConfigPath": "libs/magic-eden-api/tsconfig.lib.json"
-      }
-    }
+  
   },
   "compilerOptions": {
-    "webpack": true
   },
   "generateOptions": {
     "spec": false

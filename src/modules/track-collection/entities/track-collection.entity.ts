@@ -14,11 +14,8 @@ export class TrackCollectionItem {
 }
 const TrackCollectionItemSchema =
   SchemaFactory.createForClass(TrackCollectionItem);
-@Schema()
+@Schema({ timestamps: true })
 export class TrackCollection {
-  @Prop({ type: Date, default: Date.now })
-  createdAt: Date;
-
   @Prop({
     enum: MarketplaceType,
     default: MarketplaceType.magiceden,

@@ -5,5 +5,5 @@ export const config = {
   errorLogPath: path.join(projectBasePath, 'error.log'),
   infoLogPath: path.join(projectBasePath, 'info.log'),
   cookiesPath: path.join(projectBasePath, 'cookies.json'),
-
+  wsPort: 85,
 };

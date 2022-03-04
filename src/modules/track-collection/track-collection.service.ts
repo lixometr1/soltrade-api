@@ -1,3 +1,5 @@
+import { TrackCollectionUpdateEvent } from './events/track-collection-update.event';
+import { EventEmitter2 } from 'eventemitter2';
 import {
   TrackCollection,
   TrackCollectionDocument,
@@ -17,19 +19,82 @@ export class TrackCollectionService {
   constructor(
     @InjectModel(TrackCollection.name)
     private trackCollectionModel: Model<TrackCollectionDocument>,
+    private events: EventEmitter2,
   ) {}
   async create(createTrackCollectionDto: CreateTrackCollectionDto) {
     const doc = new this.trackCollectionModel(createTrackCollectionDto);
     return doc.save();
   }
-  async addStats(id: string, stats: AddTrackStatsDto) {
+  async createIfNotExist(collectionName: string) {
+    if (!(await this.trackCollectionModel.exists({ collectionName }))) {
+      const col = new this.trackCollectionModel({ collectionName });
+      await col.save();
+    }
+  }
+  async addStats(collectionName: string, stats: AddTrackStatsDto) {
+    await this.createIfNotExist(collectionName);
     await this.trackCollectionModel.updateOne(
-      { _id: id },
-      { $push: { floor: stats.floor } },
+      { collectionName },
+      {
+        $push: {
+          floor: stats.floor,
+          volumes: stats.volumes,
+          listedCount: stats.listedCount,
+        },
+      },
     );
-    return this.trackCollectionModel.findOne({ _id: id });
+    this.events.emit('track-collection:update', {
+      collectionName,
+      floor: stats.floor,
+      volumes: stats.volumes,
+      listedCount: stats.listedCount,
+    } as TrackCollectionUpdateEvent);
+  }
+  async addFloor(collectionName: string, floor: CreateTrackCollectionItemDto) {
+    await this.createIfNotExist(collectionName);
+    await this.trackCollectionModel.updateOne(
+      { collectionName },
+      {
+        $push: {
+          floor,
+        },
+      },
+    );
+    this.events.emit('track-collection:update', {
+      collectionName,
+      floor,
+    } as TrackCollectionUpdateEvent);
+  }
+  async addVolumesAndListedCount(
+    collectionName: string,
+    {
+      volumes,
+      listedCount,
+    }: {
+      volumes: CreateTrackCollectionItemDto;
+      listedCount: CreateTrackCollectionItemDto;
+    },
+  ) {
+    await this.createIfNotExist(collectionName);
+    await this.trackCollectionModel.updateOne(
+      { collectionName },
+      {
+        $push: {
+          volumes,
+          listedCount,
+        },
+      },
+    );
+    this.events.emit('track-collection:update', {
+      collectionName,
+      volumes,
+      listedCount,
+    } as TrackCollectionUpdateEvent);
   }
 
+  findByCollection(collectionName: string) {
+    return this.trackCollectionModel.findOne({ collectionName });
+  }
   findAll() {
     return this.trackCollectionModel.find();
   }

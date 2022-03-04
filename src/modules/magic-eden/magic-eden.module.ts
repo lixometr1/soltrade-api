@@ -31,6 +31,8 @@ export class MagicEdenModule implements OnModuleInit {
   ) {}
   async onModuleInit() {
     this.client.init();
+
+  
     // const orders = await this.orderService.findNotDone();
     // orders.forEach((order) => {
     //   this.magicEdenService.trackStartOrder(order.collectionName);
