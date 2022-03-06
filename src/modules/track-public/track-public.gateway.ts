@@ -1,3 +1,4 @@
+import { EventEmitter2 } from 'eventemitter2';
 import { Server, Socket } from 'socket.io';
 import {
   OnGatewayDisconnect,
@@ -17,21 +18,39 @@ export class TrackPublicGateway implements OnGatewayDisconnect {
   constructor(
     @Inject(forwardRef(() => TrackPublicService))
     private readonly trackPublicService: TrackPublicService,
+    private events: EventEmitter2,
   ) {}
+  getClients() {
+    return this.clients;
+  }
+  getTrackingCollections() {
+    const items = new Set();
+    Object.values(this.clients).forEach((collections) => {
+      collections.forEach((collectionName) => items.add(collectionName));
+    });
+    return [...items];
+  }
   handleDisconnect(client: Socket) {
+    const items = this.clients[client.id];
     delete this.clients[client.id];
+    this.events.emit('track-public:unsubscribe', items);
   }
   @SubscribeMessage('track-subscribe')
   trackSubscribe(client: Socket, items: string[]) {
     this.clients[client.id] = items;
     client.join(items);
     console.log('subscribe', items);
+    this.events.emit('track-public:subscribe', items);
   }
   @SubscribeMessage('track-unsubscribe')
   trackUnSubscribe(client: Socket, items: string[]) {
     this.clients[client.id] = this.clients[client.id].filter(
       (item) => !items.includes(item),
     );
+    items.forEach((collectionName) => {
+      client.leave(collectionName);
+    });
+    this.events.emit('track-public:unsubscribe', items);
   }
   emitToRoom(collectionName: string, data: any) {
     this.server.in(collectionName).emit('track-collection', data);

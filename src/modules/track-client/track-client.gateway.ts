@@ -1,4 +1,7 @@
-import { TrackClientStartDto } from './dto/track-client-start.dto';
+import { TrackClientError } from './dto/track-client-error.dto';
+import { TrackClientDistributor } from './track-client.distributor';
+import { TrackClientCollectionInfoDto } from './dto/track-client-collection-info.dto';
+import { TrackClientTask } from './types/track-client-task';
 import { CreateTrackCollectionItemDto } from './../track-collection/dto/create-track-collection.dto';
 import {
   OnGatewayConnection,
@@ -13,7 +16,7 @@ import { TrackClientTrackType } from './types/track-client-track-type.enum';
 import { Inject, forwardRef } from '@nestjs/common';
 import { TrackClientDataDto } from './dto/track-client-data.dto';
 import { config } from 'src/config/config';
-type ITimerInfo = TrackClientStartDto & { id: string };
+type ITimerInfo = TrackClientTask & { id: string };
 @WebSocketGateway(config.wsPort, { namespace: 'client' })
 export class TrackClientGateway
   implements OnGatewayConnection, OnGatewayDisconnect
@@ -25,34 +28,42 @@ export class TrackClientGateway
   constructor(
     @Inject(forwardRef(() => TrackClientService))
     private readonly trackService: TrackClientService,
+    @Inject(forwardRef(() => TrackClientDistributor))
+    private trackClientDistributor: TrackClientDistributor,
   ) {}
   handleConnection(socket: Socket) {
     this.clients.push(socket);
-
-    this.startTrack(socket, {
-      collectionName: 'magicticket',
-      type: TrackClientTrackType.floor,
-      time: 1000,
-    });
+    this.redistributeTasks();
+    // this.startTrack(socket, {
+    //   collectionName: 'magicticket',
+    //   type: TrackClientTrackType.floor,
+    //   time: 1000,
+    // });
     // this.startTrack(socket, {
     //   collectionName: 'bohemia_',
     //   type: TrackClientTrackType.floor,
     //   time: 1000,
     // });
-    // this.startTrack(socket, {
-    //   collectionName: 'degods',
-    //   type: TrackClientTrackType.floor,
-    //   time: 1000,
-    // });
-    this.startTrack(socket, {
-      collectionName: 'magicticket',
-      type: TrackClientTrackType.volumesAndListedCount,
-      time: 5000,
-    });
   }
   handleDisconnect(socket: Socket) {
     this.clients = this.clients.filter((s) => s !== socket);
     this.removeTimers(socket.id);
+    this.redistributeTasks();
+  }
+  getClients() {
+    return this.clients;
+  }
+  redistributeTasks() {
+    this.stopAll();
+    const result = this.trackClientDistributor.distribute();
+    console.log(result);
+    if(!result) return
+    Object.keys(result).forEach((clientId) => {
+      const client = this.clients.find((client) => client.id === clientId);
+      result[clientId].forEach((task) => {
+        this.startTrack(client, task);
+      });
+    });
   }
   addTimer(socketId: string, timerInfo: ITimerInfo) {
     if (!this.timers[socketId]) this.timers[socketId] = [];
@@ -67,10 +78,23 @@ export class TrackClientGateway
   removeTimers(socketId: string) {
     this.timers[socketId] = [];
   }
-  startTrack(socket: Socket, toSend: TrackClientStartDto) {
+  startTrack(socket: Socket, toSend: TrackClientTask) {
     socket.emit('start', toSend, (id: string) => {
       this.addTimer(socket.id, { ...toSend, id });
     });
+  }
+  stopTrack(socket: Socket, id: string) {
+    socket.emit('stop', id, (id: string) => {
+      this.removeTimer(socket.id, id);
+    });
+  }
+  stopTrackAll(socket: Socket) {
+    socket.emit('stopAll');
+    this.removeTimers(socket.id);
+  }
+  stopAll() {
+    this.server.emit('stopAll');
+    this.timers = {};
   }
   @SubscribeMessage('data')
   onData(client: Socket, data: TrackClientDataDto) {
@@ -79,7 +103,13 @@ export class TrackClientGateway
   }
 
   @SubscribeMessage('error')
-  onError(client: Socket, err: any) {
+  onError(client: Socket, err: TrackClientError) {
+    if(err.statusCode === 429) {
+      // pause client for 1 minute
+    }
     console.log('socket error', client.id, ' ', err);
   }
+
+  @SubscribeMessage('collection-info')
+  onCollectionInfo(client: Socket, data: TrackClientCollectionInfoDto[]) {}
 }

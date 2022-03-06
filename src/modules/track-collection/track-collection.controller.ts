@@ -27,18 +27,17 @@ export class TrackCollectionController {
     return this.trackCollectionService.findAll();
   }
 
+  @Get(':collectionName')
+  findByCollection(@Param('collectionName') collectionName: string) {
+    return this.trackCollectionService.findByCollection(collectionName)
+  }
+
+
   @Post()
   create(@Body() createTrackCollectionDto: CreateTrackCollectionDto) {
     return this.trackCollectionService.create(createTrackCollectionDto);
   }
 
-  @Post(':id/stats')
-  addFloor(
-    @Param('id') id: string,
-    @Body() createTrackCollectionDto: AddTrackStatsDto,
-  ) {
-    return this.trackCollectionService.addStats(id, createTrackCollectionDto);
-  }
 
   @Delete(':id')
   remove(@Param('id') id: string) {

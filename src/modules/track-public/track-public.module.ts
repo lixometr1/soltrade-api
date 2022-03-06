@@ -7,5 +7,6 @@ import { TrackPublicGateway } from './track-public.gateway';
 @Module({
   imports: [TrackCollectionModule],
   providers: [TrackPublicGateway, TrackPublicService, TrackPublicEvents],
+  exports: [TrackPublicGateway],
 })
 export class TrackPublicModule {}

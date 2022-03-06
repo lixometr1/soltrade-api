@@ -7,7 +7,7 @@ export type TrackCollectionDocument = TrackCollection & Document;
 @Schema()
 export class TrackCollectionItem {
   @Prop({ type: Date })
-  date: Date;
+  date: Date | string;
 
   @Prop()
   value: number;
@@ -27,6 +27,22 @@ export class TrackCollection {
 
   @Prop({ required: false })
   collectionTitle?: string;
+
+  @Prop()
+  image?: string;
+
+  @Prop()
+  description?: string;
+
+  @Prop()
+  totalItems?: number;
+
+  @Prop()
+  discord?: string;
+  @Prop()
+  twitter?: string;
+  @Prop()
+  website?: string;
 
   @Prop({ type: [TrackCollectionItemSchema], _id: false })
   floor: TrackCollectionItem[];

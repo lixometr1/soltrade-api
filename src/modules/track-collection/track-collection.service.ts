@@ -25,6 +25,9 @@ export class TrackCollectionService {
     const doc = new this.trackCollectionModel(createTrackCollectionDto);
     return doc.save();
   }
+  async exists(collectionName: string) {
+    return this.trackCollectionModel.exists({ collectionName });
+  }
   async createIfNotExist(collectionName: string) {
     if (!(await this.trackCollectionModel.exists({ collectionName }))) {
       const col = new this.trackCollectionModel({ collectionName });
@@ -32,7 +35,6 @@ export class TrackCollectionService {
     }
   }
   async addStats(collectionName: string, stats: AddTrackStatsDto) {
-    await this.createIfNotExist(collectionName);
     await this.trackCollectionModel.updateOne(
       { collectionName },
       {
@@ -98,7 +100,9 @@ export class TrackCollectionService {
   findAll() {
     return this.trackCollectionModel.find();
   }
-
+  update(collectionName: string, updateDto: UpdateTrackCollectionDto) {
+    return this.trackCollectionModel.updateOne({ collectionName }, updateDto);
+  }
   remove(id: string) {
     return this.trackCollectionModel.deleteOne({ _id: id });
   }

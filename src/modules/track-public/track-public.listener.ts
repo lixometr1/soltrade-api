@@ -12,7 +12,6 @@ export class TrackPublicEvents {
   ) {}
   @OnEvent('track-collection:update')
   onCollectionUpdate(event: TrackCollectionUpdateEvent) {
-    console.log('update collection');
     this.trackPublicService.updateRoom(event);
   }
 }
