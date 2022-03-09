@@ -19,6 +19,7 @@ export class MagicEdenBuy {
     return this.execItem(item);
   }
   async execItem(item: MagicEdenItem) {
+    if(!wallet) return
     const tx = await this.fetchBuyTx(item, wallet.publicKey.toString());
     logger.info('Fetched tx');
     return await this.magicEdenService.sendTx(tx);
