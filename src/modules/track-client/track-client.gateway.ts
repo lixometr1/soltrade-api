@@ -18,8 +18,7 @@ import { Inject, forwardRef } from '@nestjs/common';
 import { TrackClientDataDto } from './dto/track-client-data.dto';
 import { config } from 'src/config/config';
 type ITimerInfo = TrackClientTask & { id: string };
-console.log(config.wsPort)
-@WebSocketGateway(config.wsPort, { namespace: 'client' })
+@WebSocketGateway(config.wsPort, { namespace: 'client', cors: true})
 export class TrackClientGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
