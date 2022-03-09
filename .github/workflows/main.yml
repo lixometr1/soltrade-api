@@ -25,7 +25,7 @@ jobs:
       # Делаем checkout текущей ветки
       - uses: actions/checkout@v2
       # Доставляем собранное приложение на сервер
-      - name: Deploy to Server
+      - name: Send files to server  
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.DEPLOY_SERVER_HOST }}
@@ -35,13 +35,13 @@ jobs:
           source: .
           target: ${{ env.DEPLOY_PATH }}
           strip_components: 1
-      - name: executing remote ssh commands using password
+      - name: Building app
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DEPLOY_SERVER_HOST }}
           username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
           key: ${{ secrets.DEPLOY_SECRET_KEY }}
           port: ${{ secrets.DEPLOY_SERVER_PORT }}
-          script: cd /var/www/api.solatr.io && npm i && npm run build
+          script: cd /var/www/api.solatr.io && git submodule init && git submodule update && npm i && npm run build
       - name: Print Info
         run: echo "Deployed!"
