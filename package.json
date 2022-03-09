@@ -52,6 +52,7 @@
     "https-proxy-agent": "^5.0.0",
     "instagram-private-api": "^1.45.2",
     "instagram-web-api": "^2.2.2",
+    "moment": "^2.29.1",
     "mongoose": "^5.13.13",
     "node-fetch": "^2.6.6",
     "query-string": "^7.0.1",

@@ -26,18 +26,27 @@ export class TrackCollectionController {
   findAll() {
     return this.trackCollectionService.findAll();
   }
+  @Get('/popular')
+  findPopularCollections() {
+    return this.trackCollectionService.findPopularCollections({
+      skip: 0,
+      limit: 10,
+    });
+  }
+  @Get('/search/:phrase')
+  search(@Param('phrase') text: string) {
+    return this.trackCollectionService.search(text);
+  }
 
   @Get(':collectionName')
   findByCollection(@Param('collectionName') collectionName: string) {
-    return this.trackCollectionService.findByCollection(collectionName)
+    return this.trackCollectionService.findByCollection(collectionName);
   }
-
 
   @Post()
   create(@Body() createTrackCollectionDto: CreateTrackCollectionDto) {
     return this.trackCollectionService.create(createTrackCollectionDto);
   }
-
 
   @Delete(':id')
   remove(@Param('id') id: string) {

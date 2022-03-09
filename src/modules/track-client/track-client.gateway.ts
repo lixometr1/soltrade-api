@@ -1,3 +1,4 @@
+import { TrackClientFallbackService } from './track-client-fallback.service';
 import { TrackClientError } from './dto/track-client-error.dto';
 import { TrackClientDistributor } from './track-client.distributor';
 import { TrackClientCollectionInfoDto } from './dto/track-client-collection-info.dto';
@@ -30,8 +31,15 @@ export class TrackClientGateway
     private readonly trackService: TrackClientService,
     @Inject(forwardRef(() => TrackClientDistributor))
     private trackClientDistributor: TrackClientDistributor,
+    @Inject(forwardRef(() => TrackClientFallbackService))
+    private trackClientFallbackService: TrackClientFallbackService,
   ) {}
   handleConnection(socket: Socket) {
+    const token = socket.handshake.auth.token;
+    if (token !== config.socketAuthToken) {
+      socket.disconnect();
+      return;
+    }
     this.clients.push(socket);
     this.redistributeTasks();
     // this.startTrack(socket, {
@@ -56,9 +64,13 @@ export class TrackClientGateway
   redistributeTasks() {
     this.stopAll();
     const result = this.trackClientDistributor.distribute();
-    console.log(result);
-    if(!result) return
+    // console.log(result);
+    if (!result) return;
     Object.keys(result).forEach((clientId) => {
+      if (clientId === '@fallback') {
+        this.trackClientFallbackService.start(result[clientId]);
+        return;
+      }
       const client = this.clients.find((client) => client.id === clientId);
       result[clientId].forEach((task) => {
         this.startTrack(client, task);
@@ -95,16 +107,17 @@ export class TrackClientGateway
   stopAll() {
     this.server.emit('stopAll');
     this.timers = {};
+    this.trackClientFallbackService.stop();
+
   }
   @SubscribeMessage('data')
   onData(client: Socket, data: TrackClientDataDto) {
-    console.log('data', data);
     this.trackService.updateData(data);
   }
 
   @SubscribeMessage('error')
   onError(client: Socket, err: TrackClientError) {
-    if(err.statusCode === 429) {
+    if (err.statusCode === 429) {
       // pause client for 1 minute
     }
     console.log('socket error', client.id, ' ', err);

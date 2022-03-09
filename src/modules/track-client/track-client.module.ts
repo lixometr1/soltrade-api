@@ -1,4 +1,5 @@
-import { TrackClientMainService } from './track-client-main.service';
+import { TrackClientFallbackService } from './track-client-fallback.service';
+import { TrackClientCrawlerService } from './track-client-crawler.service';
 import { TrackClientListener } from './track-client.listener';
 import { TrackPublicModule } from './../track-public/track-public.module';
 import { TrackClientDistributor } from './track-client.distributor';
@@ -14,11 +15,12 @@ import { TrackClientGateway } from './track-client.gateway';
     TrackClientService,
     TrackClientDistributor,
     TrackClientListener,
-    TrackClientMainService,
+    TrackClientCrawlerService,
+    TrackClientFallbackService,
   ],
 })
 export class TrackClientModule implements OnModuleInit {
-  constructor(private trackClientMainService: TrackClientMainService) {}
+  constructor(private trackClientMainService: TrackClientCrawlerService) {}
   onModuleInit() {
     // this.trackClientMainService.run();
   }

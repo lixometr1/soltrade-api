@@ -28,8 +28,14 @@ export class TrackClientDistributor {
     const collections = this.getActiveCollections();
     const clientsCount = clients.length;
     const collectionsCount = collections.length;
-    if (!clientsCount) return;
     const result: { [key: string]: TrackClientTask[] } = {};
+    if (!clientsCount && collections.length) {
+      result['@fallback'] = collections.map((collectionName) => ({
+        collectionName,
+        type: TrackClientTrackType.floor,
+        time: 1000,
+      }));
+    }
     const collectionsPerClient = Math.round(collectionsCount / clientsCount);
 
     // active collections
@@ -52,11 +58,11 @@ export class TrackClientDistributor {
               type: TrackClientTrackType.floor,
               collectionName,
             },
-            // {
-            //   time: 5000,
-            //   type: TrackClientTrackType.volumesAndListedCount,
-            //   collectionName,
-            // },
+            {
+              time: 5000,
+              type: TrackClientTrackType.volumesAndListedCount,
+              collectionName,
+            },
             // {
             //   time: 5000,
             //   type: TrackClientTrackType.priceLayers,

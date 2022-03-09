@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { MarketplaceType } from 'src/types/marketplace-type.enum';
-
 export type TrackCollectionDocument = TrackCollection & Document;
 
 @Schema()
@@ -22,7 +21,7 @@ export class TrackCollection {
   })
   type: string;
 
-  @Prop()
+  @Prop({})
   collectionName: string;
 
   @Prop({ required: false })
@@ -56,6 +55,5 @@ export class TrackCollection {
   @Prop({ type: {}, default: () => ({}) })
   priceLayers: any;
 }
-
 export const TrackCollectionSchema =
   SchemaFactory.createForClass(TrackCollection);

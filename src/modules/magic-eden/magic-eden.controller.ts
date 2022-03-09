@@ -1,3 +1,4 @@
+import { MagicEdenBuyFloorDto } from './dto/magic-eden-buy-floor.dto';
 import { MagicEdenSellDto } from './dto/magic-eden-sell.dto';
 import { TrackStartDto } from './dto/track-start.dto';
 import {
@@ -27,17 +28,21 @@ export class MagicEdenController {
   sell(@Body() body: MagicEdenSellDto) {
     return this.magicEdenService.sell(body.mintAddress, body.price);
   }
+  @Post('/buy-floor')
+  buyFloor(@Body() body: MagicEdenBuyFloorDto) {
+    return this.magicEdenService.buyFloorPrice(body);
+  }
 
-  @Post('/track/start-order')
-  trackStartOrder(@Body() body: TrackStartDto) {
-    return this.magicEdenService.trackStartOrder(body.collectionName);
-  }
-  @Post('/track/start')
-  trackStart(@Body() body: TrackStartDto) {
-    return this.magicEdenService.trackStart(body.collectionName);
-  }
-  @Post('/track/stop')
-  trackStop(@Body('id') id: string) {
-    return this.magicEdenService.trackStop(id);
-  }
+  // @Post('/track/start-order')
+  // trackStartOrder(@Body() body: TrackStartDto) {
+  //   return this.magicEdenService.trackStartOrder(body.collectionName);
+  // }
+  // @Post('/track/start')
+  // trackStart(@Body() body: TrackStartDto) {
+  //   return this.magicEdenService.trackStart(body.collectionName);
+  // }
+  // @Post('/track/stop')
+  // trackStop(@Body('id') id: string) {
+  //   return this.magicEdenService.trackStop(id);
+  // }
 }

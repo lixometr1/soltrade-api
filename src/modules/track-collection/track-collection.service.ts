@@ -1,3 +1,7 @@
+import { trackCollectionFieldsFilterAggregation } from './aggregations/track-collection-fields-filter-aggregation';
+import { trackCollectionStatsAggregation } from './aggregations/track-collection-stats-aggregation';
+import { filterArrayDateAggregation } from './aggregations/filter-array-date';
+import { differenceAggregation } from './aggregations/difference.aggregation';
 import { TrackCollectionUpdateEvent } from './events/track-collection-update.event';
 import { EventEmitter2 } from 'eventemitter2';
 import {
@@ -13,6 +17,7 @@ import { UpdateTrackCollectionDto } from './dto/update-track-collection.dto';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { AddTrackStatsDto } from './dto/add-track-stats.dto';
+import * as moment from 'moment';
 
 @Injectable()
 export class TrackCollectionService {
@@ -25,6 +30,13 @@ export class TrackCollectionService {
     const doc = new this.trackCollectionModel(createTrackCollectionDto);
     return doc.save();
   }
+  async search(text: string) {
+    return this.trackCollectionModel
+      .find({
+        collectionTitle: new RegExp(`.*${text}.*`, 'i'),
+      })
+      .limit(10);
+  }
   async exists(collectionName: string) {
     return this.trackCollectionModel.exists({ collectionName });
   }
@@ -35,14 +47,20 @@ export class TrackCollectionService {
     }
   }
   async addStats(collectionName: string, stats: AddTrackStatsDto) {
+    const toPush: AddTrackStatsDto = {};
+    if (stats.floor) {
+      toPush.floor = stats.floor;
+    }
+    if (stats.volumes) {
+      toPush.volumes = stats.volumes;
+    }
+    if (stats.listedCount) {
+      toPush.listedCount = stats.listedCount;
+    }
     await this.trackCollectionModel.updateOne(
       { collectionName },
       {
-        $push: {
-          floor: stats.floor,
-          volumes: stats.volumes,
-          listedCount: stats.listedCount,
-        },
+        $push: toPush,
       },
     );
     this.events.emit('track-collection:update', {
@@ -94,8 +112,31 @@ export class TrackCollectionService {
     } as TrackCollectionUpdateEvent);
   }
 
-  findByCollection(collectionName: string) {
-    return this.trackCollectionModel.findOne({ collectionName });
+  async findPopularCollections({ skip, limit }) {
+    const result = await this.trackCollectionModel.aggregate([
+      trackCollectionFieldsFilterAggregation(),
+      trackCollectionStatsAggregation(),
+      { $unset: ['floor24', 'volumes24', 'listedCount24'] },
+      { $sort: { volumes24h: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+    ]);
+    return result;
+  }
+  async findByCollection(collectionName: string) {
+    // floor change between yesterday and now
+    // listings change between yesterday and now
+    // 24h volumes (today 00:00 - now)
+
+    const [result] = await this.trackCollectionModel.aggregate([
+      { $match: { collectionName } },
+      trackCollectionFieldsFilterAggregation(30),
+      trackCollectionStatsAggregation(),
+
+      { $unset: ['floor24', 'volumes24', 'listedCount24'] },
+      { $limit: 1 },
+    ]);
+    return result;
   }
   findAll() {
     return this.trackCollectionModel.find();

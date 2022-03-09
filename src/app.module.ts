@@ -34,6 +34,9 @@ import { TrackClientModule } from './modules/track-client/track-client.module';
       process.env.MONGODB_URI || 'mongodb://localhost/solbot',
       {
         useCreateIndex: true,
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false,
       },
     ),
     ScheduleModule.forRoot(),

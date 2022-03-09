@@ -1,8 +1,8 @@
-import { IGetCollectionStats } from './../../../libs/magic-eden-api/src/functions/get-collection-stats';
-import { IGetCollectionItem } from './../../../libs/magic-eden-api/src/functions/get-all-collections';
-import { getVolumesAndListedCount } from './../../../libs/magic-eden-api/src/functions/get-volumes-and-listed-count';
-import { fetchRetry } from './../../helpers/fetch-retry';
-import { TrackCollectionService } from './../track-collection/track-collection.service';
+import { IGetCollectionStats } from '../../../libs/magic-eden-api/src/functions/get-collection-stats';
+import { IGetCollectionItem } from '../../../libs/magic-eden-api/src/functions/get-all-collections';
+import { getVolumesAndListedCount } from '../../../libs/magic-eden-api/src/functions/get-volumes-and-listed-count';
+import { fetchRetry } from '../../helpers/fetch-retry';
+import { TrackCollectionService } from '../track-collection/track-collection.service';
 import * as magicEden from '@app/magic-eden-api';
 import { Inject, forwardRef } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
@@ -10,7 +10,9 @@ import * as web3 from '@solana/web3.js';
 import { logger } from 'src/helpers/logger';
 import { Requester } from 'cloudscraper';
 import { RequestError } from 'cloudscraper/errors';
-export class TrackClientMainService {
+import * as cloudscraper from "cloudscraper"
+// cloudscrape
+export class TrackClientCrawlerService {
   constructor(
     @Inject(forwardRef(() => TrackCollectionService))
     private trackCollection: TrackCollectionService,
@@ -55,6 +57,9 @@ export class TrackClientMainService {
     try {
       let floorPrice = stats.floorPrice / web3.LAMPORTS_PER_SOL;
       floorPrice = +floorPrice.toFixed(3);
+      if (isNaN(floorPrice)) {
+        floorPrice = undefined;
+      }
       const listedCount = stats.listedCount;
       let volumes = stats.volumeAll / web3.LAMPORTS_PER_SOL;
       if (!stats.volumeAll) {
@@ -81,9 +86,9 @@ export class TrackClientMainService {
         await this.trackCollection.update(collection.symbol, collectionEntity);
       }
       await this.trackCollection.addStats(collection.symbol, {
-        floor: { value: floorPrice, date },
-        listedCount: { value: listedCount, date },
-        volumes: { value: volumes, date },
+        floor: floorPrice && { value: floorPrice, date },
+        listedCount: listedCount && { value: listedCount, date },
+        volumes: volumes && { value: volumes, date },
       });
     } catch (err: any) {
       if (err instanceof RequestError) {

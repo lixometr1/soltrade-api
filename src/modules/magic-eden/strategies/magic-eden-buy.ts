@@ -19,7 +19,7 @@ export class MagicEdenBuy {
     return this.execItem(item);
   }
   async execItem(item: MagicEdenItem) {
-    const tx = await this.fetchBuyTx(item);
+    const tx = await this.fetchBuyTx(item, wallet.publicKey.toString());
     logger.info('Fetched tx');
     return await this.magicEdenService.sendTx(tx);
   }
@@ -27,9 +27,9 @@ export class MagicEdenBuy {
     const { data } = await magicEden.getItem(mintToken);
     return data;
   }
-  async fetchBuyTx(item: MagicEdenItem): Promise<number[]> {
+  async fetchBuyTx(item: MagicEdenItem, buyer: string): Promise<number[]> {
     const { data } = await magicEden.buyTransaction({
-      buyer: wallet.publicKey.toString(),
+      buyer,
       seller: item.owner,
       auctionHouseAddress: item.v2.auctionHouseKey,
       tokenMint: item.mintAddress,

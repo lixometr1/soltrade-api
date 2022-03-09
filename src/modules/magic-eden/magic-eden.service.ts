@@ -1,15 +1,11 @@
-import { getMyItems } from './../../../libs/magic-eden-api/src/functions/get-my-items';
-import { getListedItems } from './../../../libs/magic-eden-api/src/functions/get-listed-items';
-import {
-  getCollectionItems,
-  getTransactionInfo,
-} from '@app/magic-eden-api';
+import { MagicEdenBuyFloorDto } from './dto/magic-eden-buy-floor.dto';
+import * as magicEden from '@app/magic-eden-api';
 import { OrderService } from './../order/order.service';
 import { MagicEdenTrack } from './strategies/magic-eden-track';
 import { MagicEdenSell } from './strategies/magic-eden-sell';
 import { MagicEdenBuy } from './strategies/magic-eden-buy';
 import { MagicEdenClient } from './magic-eden-client';
-import { forwardRef, Inject, Injectable, Body } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Body, UnprocessableEntityException, InternalServerErrorException } from '@nestjs/common';
 import { connection, wallet } from 'src/helpers/web3-connection';
 import { CreateMagicEdenDto } from './dto/create-magic-eden.dto';
 import { UpdateMagicEdenDto } from './dto/update-magic-eden.dto';
@@ -18,6 +14,7 @@ import * as cloudscraper from 'cloudscraper';
 import { logger } from 'src/helpers/logger';
 import { IRpcTransactionInfo } from './types/rpc-transaction-info.interface';
 import { MagicEdenItem } from '@app/magic-eden-api';
+import { fetchRetry } from 'src/helpers/fetch-retry';
 
 @Injectable()
 export class MagicEdenService {
@@ -56,11 +53,11 @@ export class MagicEdenService {
     return response;
   }
   async getMagicEdenTransactionInfo(transactionId: string) {
-    const { data } = await getTransactionInfo(transactionId);
+    const { data } = await magicEden.getTransactionInfo(transactionId);
     return data;
   }
   async getCollectionItems(slug: string): Promise<MagicEdenItem[]> {
-    const { data, headers } = await getCollectionItems({
+    const { data, headers } = await magicEden.getCollectionItems({
       slug,
       sort: { takerAmount: 1, createdAt: -1 },
       skip: 0,
@@ -70,11 +67,13 @@ export class MagicEdenService {
     return data;
   }
   async getListedItems() {
-    const { data } = await getListedItems(wallet.publicKey.toString());
+    const { data } = await magicEden.getListedItems(
+      wallet.publicKey.toString(),
+    );
     return data;
   }
   async getMyItems() {
-    const { data } = await getMyItems(wallet.publicKey.toString());
+    const { data } = await magicEden.getMyItems(wallet.publicKey.toString());
     return data;
   }
 
@@ -92,6 +91,21 @@ export class MagicEdenService {
   }
   async buy(mintToken: string) {
     return this.buyStrategy.exec(mintToken);
+  }
+  async buyFloorPrice({ collectionName, buyer }: MagicEdenBuyFloorDto) {
+    const response = await fetchRetry(() =>
+      magicEden.getFloorPrice(collectionName),
+    );
+    if(!response) {
+      throw new InternalServerErrorException('Error. Please try again')
+    }
+    const { items, data } = response
+     const cheapestItem = items.find((item) => item.price <= data);
+    const tx = await this.buyStrategy.fetchBuyTx(cheapestItem, buyer);
+    // const transaction = web3.Transaction.populate(
+    //   web3.Message.from(Buffer.from(tx)),
+    // );
+    return tx;
   }
   async sendTx(tx: number[]) {
     const transaction = web3.Transaction.populate(

@@ -28,7 +28,7 @@ export class TrackPublicGateway implements OnGatewayDisconnect {
     Object.values(this.clients).forEach((collections) => {
       collections.forEach((collectionName) => items.add(collectionName));
     });
-    return [...items];
+    return [...items] as string[];
   }
   handleDisconnect(client: Socket) {
     const items = this.clients[client.id];
@@ -37,7 +37,7 @@ export class TrackPublicGateway implements OnGatewayDisconnect {
   }
   @SubscribeMessage('track-subscribe')
   trackSubscribe(client: Socket, items: string[]) {
-    this.clients[client.id] = items;
+    this.clients[client.id] = items || [];
     client.join(items);
     console.log('subscribe', items);
     this.events.emit('track-public:subscribe', items);
@@ -50,6 +50,8 @@ export class TrackPublicGateway implements OnGatewayDisconnect {
     items.forEach((collectionName) => {
       client.leave(collectionName);
     });
+    console.log('unsubscribe', items);
+
     this.events.emit('track-public:unsubscribe', items);
   }
   emitToRoom(collectionName: string, data: any) {
