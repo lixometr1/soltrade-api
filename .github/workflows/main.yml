@@ -42,6 +42,6 @@ jobs:
           username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
           key: ${{ secrets.DEPLOY_SECRET_KEY }}
           port: ${{ secrets.DEPLOY_SERVER_PORT }}
-          script: cd /var/www/api.solatr.io && git submodule init && git submodule update && npm i && npm run build && pm2 restart solatr-api
+          script: cd /var/www/api.solatr.io && git submodule init && git submodule update && npm i && npm run build
       - name: Print Info
         run: echo "Deployed!"
