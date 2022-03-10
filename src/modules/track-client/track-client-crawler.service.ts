@@ -10,14 +10,14 @@ import * as web3 from '@solana/web3.js';
 import { logger } from 'src/helpers/logger';
 import { Requester } from 'cloudscraper';
 import { RequestError } from 'cloudscraper/errors';
-import * as cloudscraper from "cloudscraper"
+import * as cloudscraper from 'cloudscraper';
 // cloudscrape
 export class TrackClientCrawlerService {
   constructor(
     @Inject(forwardRef(() => TrackCollectionService))
     private trackCollection: TrackCollectionService,
   ) {}
-  async run() {
+  async run(times = 0) {
     logger.info('Run Crawler');
     let { data: collections } = await fetchRetry(magicEden.getAllCollections);
     if (!collections) {
@@ -25,9 +25,13 @@ export class TrackClientCrawlerService {
       collections = data;
     }
     if (!collections) {
+      if (times > 3) {
+        logger.info('Crawler failed');
+        return;
+      }
       logger.info('Crawler error, waiting 1 minute');
       setTimeout(() => {
-        this.run();
+        this.run(times + 1);
       }, 600000);
       return;
     }

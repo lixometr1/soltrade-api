@@ -13,22 +13,23 @@ import { BullModule } from '@nestjs/bull';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TrackClientModule } from './modules/track-client/track-client.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot(),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
-    BullModule.forRoot({
-      defaultJobOptions: {
-        removeOnComplete: true,
-        removeOnFail: true,
-      },
-      redis: {
-        host: 'localhost',
-        port: 6379,
-      },
-    }),
+    // BullModule.forRoot({
+    //   defaultJobOptions: {
+    //     removeOnComplete: true,
+    //     removeOnFail: true,
+    //   },
+    //   redis: {
+    //     host: 'localhost',
+    //     port: 6379,
+    //   },
+    // }),
 
     MongooseModule.forRoot(
       process.env.MONGODB_URI || 'mongodb://localhost/solbot',

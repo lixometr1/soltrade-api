@@ -13,7 +13,6 @@ export class TrackClientFallbackService {
     private trackClientService: TrackClientService,
   ) {}
   async run() {
-    console.log('run')
     try {
       const stats = await magicEden.getMulticollectionStats(
         this.collectionNames,

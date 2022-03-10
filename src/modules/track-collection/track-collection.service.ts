@@ -17,7 +17,6 @@ import { UpdateTrackCollectionDto } from './dto/update-track-collection.dto';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { AddTrackStatsDto } from './dto/add-track-stats.dto';
-import * as moment from 'moment';
 
 @Injectable()
 export class TrackCollectionService {
