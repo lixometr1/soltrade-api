@@ -3,7 +3,7 @@ import { filterArrayDateAggregation } from './filter-array-date';
 
 export const trackCollectionFieldsFilterAggregation = (days = 0) => {
   const fromDate = moment().startOf('day').subtract(days, 'days').toDate();
-  const yesterday = moment().startOf('day').toDate();
+  const yesterday = moment().subtract(24, 'hours').toDate();
   return {
     $addFields: {
       floor: filterArrayDateAggregation('floor', fromDate),
