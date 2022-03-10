@@ -31,9 +31,16 @@ export class TrackCollectionService {
   }
   async search(text: string) {
     return this.trackCollectionModel
-      .find({
-        collectionTitle: new RegExp(`.*${text}.*`, 'i'),
-      })
+      .find(
+        {
+          collectionTitle: new RegExp(`.*${text}.*`, 'i'),
+        },
+        {
+          floor: 0,
+          volumes: 0,
+          listedCount: 0,
+        },
+      )
       .limit(10);
   }
   async exists(collectionName: string) {
