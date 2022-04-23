@@ -5,7 +5,14 @@ import { MagicEdenTrack } from './strategies/magic-eden-track';
 import { MagicEdenSell } from './strategies/magic-eden-sell';
 import { MagicEdenBuy } from './strategies/magic-eden-buy';
 import { MagicEdenClient } from './magic-eden-client';
-import { forwardRef, Inject, Injectable, Body, UnprocessableEntityException, InternalServerErrorException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  Body,
+  UnprocessableEntityException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { connection, wallet } from 'src/helpers/web3-connection';
 import { CreateMagicEdenDto } from './dto/create-magic-eden.dto';
 import { UpdateMagicEdenDto } from './dto/update-magic-eden.dto';
@@ -92,15 +99,17 @@ export class MagicEdenService {
   async buy(mintToken: string) {
     return this.buyStrategy.exec(mintToken);
   }
+  async trackInnerBuy() {}
+  // public
   async buyFloorPrice({ collectionName, buyer }: MagicEdenBuyFloorDto) {
     const response = await fetchRetry(() =>
       magicEden.getFloorPrice(collectionName),
     );
-    if(!response) {
-      throw new InternalServerErrorException('Error. Please try again')
+    if (!response) {
+      throw new InternalServerErrorException('Error. Please try again');
     }
-    const { items, data } = response
-     const cheapestItem = items.find((item) => item.price <= data);
+    const { items, data } = response;
+    const cheapestItem = items.find((item) => item.price <= data);
     const tx = await this.buyStrategy.fetchBuyTx(cheapestItem, buyer);
     // const transaction = web3.Transaction.populate(
     //   web3.Message.from(Buffer.from(tx)),
@@ -108,22 +117,27 @@ export class MagicEdenService {
     return tx;
   }
   async sendTx(tx: number[]) {
-    const transaction = web3.Transaction.populate(
-      web3.Message.from(Buffer.from(tx)),
-    );
-    const transactionId = await web3.sendAndConfirmTransaction(
-      connection,
-      transaction,
-      [wallet],
-    );
-    // const info = await this.getTransacitonInfo(transactionId);
-    const meInfo = await this.getMagicEdenTransactionInfo(transactionId);
-    let status = 1;
+    try {
+      const transaction = web3.Transaction.populate(
+        web3.Message.from(Buffer.from(tx)),
+      );
+      const transactionId = await web3.sendAndConfirmTransaction(
+        connection,
+        transaction,
+        [wallet],
+      );
+      // const info = await this.getTransacitonInfo(transactionId);
+      const meInfo = await this.getMagicEdenTransactionInfo(transactionId);
+      let status = 1;
 
-    if (!meInfo.instructions.length) {
-      status = 0;
+      if (!meInfo.instructions.length) {
+        status = 0;
+      }
+      return { status, transactionId };
+    } catch (err) {
+      console.log(err)
+      return { status: 0 };
     }
-    return { status, transactionId };
   }
   async airdrop() {
     const airdropSignature = await connection.requestAirdrop(

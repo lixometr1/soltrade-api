@@ -25,7 +25,7 @@ export class TrackClientCrawlerService {
       collections = data;
     }
     if (!collections) {
-      if (times > 3) {
+      if (times > 2) {
         logger.info('Crawler failed');
         return;
       }
@@ -105,6 +105,7 @@ export class TrackClientCrawlerService {
 
   @Cron('0 */30 * * * *')
   schedule() {
+    if (process.env.MODE === 'private') return;
     // every 30 min
     this.run();
   }

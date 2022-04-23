@@ -13,12 +13,12 @@ export class OrderService {
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
     @Inject(forwardRef(() => MagicEdenService))
     private magicEdenService: MagicEdenService,
-    private eventEmiter: EventEmitter2
+    private eventEmiter: EventEmitter2,
   ) {}
   async create(createOrderDto: CreateOrderDto) {
     const item = new this.orderModel(createOrderDto);
     this.magicEdenService.trackStartOrder(createOrderDto.collectionName);
-    this.eventEmiter.emit('order:create')
+    this.eventEmiter.emit('order:create');
     return item.save();
   }
 

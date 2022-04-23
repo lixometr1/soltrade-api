@@ -1,3 +1,5 @@
+import { TrackPublicGateway } from './../track-public/track-public.gateway';
+import { TrackPublicModule } from './../track-public/track-public.module';
 import { OrderService } from './../order/order.service';
 import { OrderModule } from './../order/order.module';
 
@@ -9,9 +11,10 @@ import { Inject, Module, OnModuleInit, forwardRef } from '@nestjs/common';
 import { MagicEdenService } from './magic-eden.service';
 import { MagicEdenController } from './magic-eden.controller';
 import { MongooseModule } from '@nestjs/mongoose';
+import { Namespace, Socket } from 'socket.io';
 
 @Module({
-  imports: [forwardRef(() => OrderModule)],
+  imports: [forwardRef(() => OrderModule), forwardRef(() => TrackPublicModule)],
   controllers: [MagicEdenController],
   providers: [
     MagicEdenService,
@@ -28,14 +31,16 @@ export class MagicEdenModule implements OnModuleInit {
     private magicEdenService: MagicEdenService,
     @Inject(forwardRef(() => OrderService))
     private orderService: OrderService,
+    @Inject(forwardRef(() => TrackPublicGateway))
+    private trackPublicGateway: TrackPublicGateway,
   ) {}
   async onModuleInit() {
     this.client.init();
-
-  
-    // const orders = await this.orderService.findNotDone();
-    // orders.forEach((order) => {
-    //   this.magicEdenService.trackStartOrder(order.collectionName);
-    // });
+    if (process.env.MODE === 'private') {
+      const orders = await this.orderService.findNotDone();
+      orders.forEach((order) => {
+        this.magicEdenService.trackStartOrder(order.collectionName);
+      });
+    }
   }
 }

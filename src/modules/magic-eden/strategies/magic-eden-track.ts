@@ -7,6 +7,7 @@ import { logger } from 'src/helpers/logger';
 import { MagicEdenBuy } from './magic-eden-buy';
 import { v4 as uuid } from 'uuid';
 import { MagicEdenItem } from '@app/magic-eden-api';
+import { fetchRetry } from 'src/helpers/fetch-retry';
 export class MagicEdenTrack {
   private trackers = {};
   constructor(
@@ -31,9 +32,10 @@ export class MagicEdenTrack {
     (async () => {
       while (true) {
         if (!this.trackers[id]) return;
-        const items = await this.magicEdenService.getCollectionItems(
-          collectionName,
+        const items = await fetchRetry(() =>
+          this.magicEdenService.getCollectionItems(collectionName),
         );
+        items?.sort((a, b) => a.price - b.price)
         await fn(items, id);
         await new Promise((resolve) =>
           setTimeout(() => {
@@ -83,6 +85,9 @@ export class MagicEdenTrack {
         await this.orderService.fullfillOrder(order._id);
         this.stop(id);
         logger.info(`Order ${order.id} done! ${transactionId} - ${status}`);
+      } else {
+        logger.info(`Order ${order.id} ERROR! `);
+        throw 'ERROR'
       }
     });
   }
