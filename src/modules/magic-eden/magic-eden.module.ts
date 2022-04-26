@@ -1,3 +1,4 @@
+import { MagicEdenMint } from './strategies/magic-eden-mint';
 import { TrackPublicGateway } from './../track-public/track-public.gateway';
 import { TrackPublicModule } from './../track-public/track-public.module';
 import { OrderService } from './../order/order.service';
@@ -22,6 +23,7 @@ import { Namespace, Socket } from 'socket.io';
     MagicEdenBuy,
     MagicEdenSell,
     MagicEdenTrack,
+    MagicEdenMint
   ],
   exports: [MagicEdenService],
 })
@@ -29,6 +31,7 @@ export class MagicEdenModule implements OnModuleInit {
   constructor(
     private client: MagicEdenClient,
     private magicEdenService: MagicEdenService,
+    private magicEdenMint: MagicEdenMint,
     @Inject(forwardRef(() => OrderService))
     private orderService: OrderService,
     @Inject(forwardRef(() => TrackPublicGateway))
@@ -36,6 +39,7 @@ export class MagicEdenModule implements OnModuleInit {
   ) {}
   async onModuleInit() {
     this.client.init();
+    // this.magicEdenMint.run()
     if (process.env.MODE === 'private') {
       const orders = await this.orderService.findNotDone();
       orders.forEach((order) => {

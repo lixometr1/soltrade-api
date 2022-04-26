@@ -24,7 +24,7 @@ export class MagicEdenTrack {
   async exec(
     collectionName: string,
     fn: (items: MagicEdenItem[], id: string) => Promise<void>,
-    time = 500,
+    time = 300,
   ) {
     const id = collectionName;
     logger.info('Track Start - ' + id);
